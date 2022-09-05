@@ -14,18 +14,20 @@ class ViewController: UIViewController, UIPickerViewDataSource, UIPickerViewDele
     @IBOutlet var lblResult: UILabel!
     
     var temperatureIntervals = (-100...100).map{$0}
-
+    
     var converter = Converter()
     
     var lastValue = "lastValue"
+    
+    var convertTo = "Fahrenheit"
     
     override func viewDidLoad() {
         super.viewDidLoad()
         // Do any additional setup after loading the view.
         
-//        for index in -100...100 {
-//            temperatureIntervals.append(index)
-//        }
+        //        for index in -100...100 {
+        //            temperatureIntervals.append(index)
+        //        }
         
         myPickerView.selectRow(getInitialValue(), inComponent: 0, animated: false)
         
@@ -35,24 +37,64 @@ class ViewController: UIViewController, UIPickerViewDataSource, UIPickerViewDele
     }
     
     func numberOfComponents(in pickerView: UIPickerView) -> Int {
-        return 1
+        return 2
     }
     
     func pickerView(_ pickerView: UIPickerView, numberOfRowsInComponent component: Int) -> Int {
-        return temperatureIntervals.count
+        switch component {
+        case 0:
+            return 2
+        case 1:
+            return temperatureIntervals.count
+        default: return 1
+        }
     }
-
+    
     func pickerView(_ pickerView: UIPickerView, titleForRow row: Int, forComponent component: Int) -> String? {
-        return "\(temperatureIntervals[row]) ℃ "
+        if component == 0 {
+            switch row {
+            case 0: return "Fahrenheit"
+            case 1: return "Celsius"
+            default: return "Fahrenheit"
+            }
+        } else {
+            if convertTo == "Fahrenheit" {
+                return "\(temperatureIntervals[row]) ℃ "
+            } else {
+                return "\(temperatureIntervals[row]) ℉ "
+            }
+            
+        }
     }
     
     func pickerView(_ pickerView: UIPickerView, didSelectRow row: Int, inComponent component: Int) {
-       
-        let fahrenheit = converter.toFahrenheit(fromCelsius: temperatureIntervals[row])
         
-        saveToDefault(row: row)
+        if component == 0 {
+            if row == 0 {
+                convertTo = "Fahrenheit"
+            } else {
+                convertTo = "Celsius"
+            }
+            
+            pickerView.reloadComponent(1)
+        } else {
+            
+            
+            if convertTo == "Celsius" {
+                let celsius = converter.toCelsius(fromFahrenheit: temperatureIntervals[row])
+                saveToDefault(row: row)
+                lblResult.text = "\(String(celsius)) ℃"
+            } else {
+                let fahrenheit = converter.toFahrenheit(fromCelsius: temperatureIntervals[row])
+                saveToDefault(row: row)
+                lblResult.text = "\(String(fahrenheit)) ℉"
+            }
+            
+            
+        }
         
-        lblResult.text = "\(String(fahrenheit)) ℉"
+        
+        
     }
     
     
@@ -78,6 +120,6 @@ class ViewController: UIViewController, UIPickerViewDataSource, UIPickerViewDele
         defaults.synchronize()
         
     }
-
+    
 }
 

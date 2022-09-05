@@ -16,4 +16,12 @@ class Converter {
         return Int(round(fahrenheit))
     }
     
+    func toCelsius(fromFahrenheit: Int) -> Int {
+        
+        let celsius = (Double(fromFahrenheit) - 32.0) / 1.8
+        
+        return Int(round(celsius))
+        
+    }
+    
 }
